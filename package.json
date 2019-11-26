@@ -1,0 +1,60 @@
+{
+  "name": "react-instagram-carousel",
+  "version": "1.0.1",
+  "files": [
+    "build"
+  ],
+  "main": "build/index.js",
+  "description": "carousel for React that like instagram story",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hktysk/react-instagram-carousel.git"
+  },
+  "keywords": [
+    "react",
+    "instagram",
+    "carousel"
+  ],
+  "author": "hktysk",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc && babel --plugins '@babel/plugin-transform-modules-commonjs' ./build --out-dir ./build",
+    "start": "webpack-dev-server --hot --open"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@types/lodash": "^4.14.149",
+    "lodash": "^4.17.15",
+    "use-interval": "^1.1.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.7.0",
+    "@types/enzyme": "^3.10.3",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
+    "@types/jest": "^24.0.21",
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.3",
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "css-loader": "^3.2.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
+    "jest": "^24.9.0",
+    "node-sass": "^4.13.0",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.0",
+    "ts-jest": "^24.1.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.2",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
+  },
+  "bugs": {
+    "url": "https://github.com/hktysk/react-instagram-carousel/issues"
+  },
+  "homepage": "https://github.com/hktysk/react-instagram-carousel#readme"
+}
