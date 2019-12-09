@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useInterval from 'use-interval';
 import './style.css';
 
@@ -37,6 +37,11 @@ const App: React.FC<Props> = (props) => {
 
   /* common function */
   const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  /* init */
+  useEffect(() => {
+    setTime(0);
+  }, [props]);
 
   /* main processing */
   useInterval(() => {

@@ -200,8 +200,13 @@ var App = function (props) {
       return setTimeout(r, ms);
     });
   };
-  /* main processing */
+  /* init */
 
+
+  (0, _react.useEffect)(function () {
+    setTime(0);
+  }, [props]);
+  /* main processing */
 
   (0, _useInterval.default)(function () {
     if (stop === true) return;
