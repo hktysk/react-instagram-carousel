@@ -206,9 +206,18 @@ var App = function (props) {
   (0, _react.useEffect)(function () {
     setTime(0);
   }, [props]);
-  /* main processing */
+  /* manage interval */
+
+  var _d = (0, _react.useState)(true),
+      intervalState = _d[0],
+      setIntervalState = _d[1];
 
   (0, _useInterval.default)(function () {
+    return setIntervalState(!intervalState);
+  }, speed);
+  /* main processing */
+
+  (0, _react.useEffect)(function () {
     if (stop === true) return;
 
     (function () {
@@ -258,7 +267,7 @@ var App = function (props) {
         });
       });
     })();
-  }, speed);
+  }, [intervalState]);
   /* use for display image and progress */
 
   var nowTime = Math.floor(time / nextMsec);
@@ -273,19 +282,13 @@ var App = function (props) {
 
 
   var coordX = (0, _react.useRef)(0);
-  var interval;
 
   function ontouchstart(e) {
     var touches = e.changedTouches[0];
     coordX.current = touches.pageX;
-    interval = setTimeout(function () {
-      return setStop(true);
-    }, 300);
   }
 
   function ontouchend(e) {
-    if (interval) clearTimeout(interval);
-    setStop(false);
     var touches = e.changedTouches[0];
     var diff = touches.pageX - coordX.current;
 
@@ -296,14 +299,20 @@ var App = function (props) {
 
   return _react.default.createElement("div", {
     id: "react-instagram-carousel",
-    style: {
-      backgroundImage: "url(" + image + ")",
-      backgroundSize: backgroundSize,
-      backgroundColor: backgroundColor
-    },
     onTouchStart: ontouchstart,
     onTouchEnd: ontouchend
-  }, _react.default.createElement("div", {
+  }, images.map(function (v) {
+    return _react.default.createElement("div", {
+      className: "images-in-carousel",
+      style: {
+        backgroundImage: "url(" + v + ")",
+        backgroundSize: backgroundSize,
+        backgroundColor: backgroundColor,
+        opacity: v === image ? 1 : 0
+      },
+      key: v
+    });
+  }), _react.default.createElement("div", {
     className: "hidden-box-for-click-skip",
     onClick: function () {
       return skip('decreace');
@@ -329,7 +338,7 @@ var App = function (props) {
         width: k + 1 <= nowTime // already
         ? '100%' : k === nowTime // nowTime
         ? Math.floor(time + speed - k * nextMsec) / nextMsec * 100 + "%" : '0%',
-        transition: transition ? '.2s linear' : '0s'
+        transition: transition ? speed + "ms linear" : '0s'
       },
       key: k
     }));

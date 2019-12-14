@@ -43,8 +43,12 @@ const App: React.FC<Props> = (props) => {
     setTime(0);
   }, [props]);
 
+  /* manage interval */
+  const [intervalState, setIntervalState] = useState<boolean>(true);
+  useInterval(() => setIntervalState(!intervalState), speed);
+
   /* main processing */
-  useInterval(() => {
+  useEffect(() => {
     if (stop === true) return;
 
     (async () => {
@@ -73,7 +77,7 @@ const App: React.FC<Props> = (props) => {
       setTime(isMinus ? speed : isOverMax ? max : n);
       skipTime.current = 0;
     })()
-  }, speed);
+  }, [intervalState]);
 
   /* use for display image and progress */
   const nowTime = Math.floor(time / nextMsec);
@@ -88,17 +92,12 @@ const App: React.FC<Props> = (props) => {
   /* when flip */
   const coordX = useRef<number>(0);
 
-  let interval: ReturnType<typeof setTimeout>
   function ontouchstart(e: any): void {
     const touches = e.changedTouches[0];
     coordX.current = touches.pageX;
-    interval = setTimeout(() => setStop(true), 300);
   }
 
   function ontouchend(e: any): void {
-    if (interval) clearTimeout(interval)
-    setStop(false);
-
     const touches = e.changedTouches[0];
     const diff = touches.pageX - coordX.current;
     if (Math.abs(diff) > 100) {
@@ -108,11 +107,23 @@ const App: React.FC<Props> = (props) => {
 
 
   return (
-    <div id="react-instagram-carousel" style={{
-      backgroundImage: `url(${image})`,
-      backgroundSize: backgroundSize,
-      backgroundColor: backgroundColor,
-    }} onTouchStart={ontouchstart} onTouchEnd={ontouchend}>
+    <div id="react-instagram-carousel"
+      onTouchStart={ontouchstart}
+      onTouchEnd={ontouchend}>
+
+      {
+        images.map(v => (
+          <div
+            className="images-in-carousel"
+            style={{
+              backgroundImage: `url(${v})`,
+              backgroundSize,
+              backgroundColor,
+              opacity: v === image ? 1 : 0
+            }}
+            key={v} />
+        ))
+      }
 
       <div
         className="hidden-box-for-click-skip"
@@ -135,7 +146,7 @@ const App: React.FC<Props> = (props) => {
                     : k === nowTime // nowTime
                       ? `${(Math.floor((time + speed) - (k * nextMsec)) / nextMsec) * 100}%`
                       : '0%', // still
-                transition: transition  ? '.2s linear' : '0s'
+                transition: transition  ? `${speed}ms linear` : '0s'
               }} key={k} />
             </div>
           ))

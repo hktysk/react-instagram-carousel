@@ -1,6 +1,6 @@
 {
   "name": "react-instagram-carousel",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "files": [
     "build"
   ],
@@ -18,7 +18,7 @@
   "author": "hktysk",
   "scripts": {
     "test": "jest",
-    "build": "tsc && babel --plugins '@babel/plugin-transform-modules-commonjs' ./build --out-dir ./build",
+    "build": "tsc && babel --plugins '@babel/plugin-transform-modules-commonjs' ./build --out-dir ./build && node-sass src/style.sass build/style.css",
     "start": "webpack-dev-server --hot --open"
   },
   "license": "MIT",
