@@ -107,11 +107,23 @@ const App: React.FC<Props> = (props) => {
 
 
   return (
-    <div id="react-instagram-carousel" style={{
-      backgroundImage: `url(${image})`,
-      backgroundSize: backgroundSize,
-      backgroundColor: backgroundColor,
-    }} onTouchStart={ontouchstart} onTouchEnd={ontouchend}>
+    <div id="react-instagram-carousel"
+      onTouchStart={ontouchstart}
+      onTouchEnd={ontouchend}>
+
+      {
+        images.map(v => (
+          <div
+            className="images-in-carousel"
+            style={{
+              backgroundImage: `url(${v})`,
+              backgroundSize,
+              backgroundColor,
+              opacity: v === image ? 1 : 0
+            }}
+            key={v} />
+        ))
+      }
 
       <div
         className="hidden-box-for-click-skip"
