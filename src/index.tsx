@@ -40,8 +40,10 @@ const App: React.FC<Props> = (props) => {
 
   /* init */
   useEffect(() => {
+    setTransition(false);
     setTime(0);
-  }, [props]);
+    setTransition(true);
+  }, [props.images]);
 
   /* manage interval */
   const [intervalState, setIntervalState] = useState<boolean>(true);
