@@ -204,8 +204,10 @@ var App = function (props) {
 
 
   (0, _react.useEffect)(function () {
+    setTransition(false);
     setTime(0);
-  }, [props]);
+    setTransition(true);
+  }, [props.images]);
   /* manage interval */
 
   var _d = (0, _react.useState)(true),
