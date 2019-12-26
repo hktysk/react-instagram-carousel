@@ -3,7 +3,6 @@ import './style.css';
 declare type Props = {
     images: string[];
     nextMsec?: number;
-    speed?: number;
     barHeight?: number;
     backgroundSize?: 'cover' | 'contain';
     backgroundColor?: string;

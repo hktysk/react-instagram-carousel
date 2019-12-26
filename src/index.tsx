@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import useInterval from 'use-interval';
 import './style.css';
 
 type Props = {
   images: string[]
   nextMsec?: number
-  speed?: number
   barHeight?: number
   backgroundSize?: 'cover' | 'contain'
   backgroundColor?: string
@@ -17,139 +15,133 @@ const App: React.FC<Props> = (props) => {
 
   /* define base variable */
   const nextMsec: number = props.nextMsec || 5000;
-  const max: number = nextMsec * images.length - 1;
-  const speed: number = props.speed || 200;
   const barHeight: number = props.barHeight || 1.5;
   const backgroundSize: 'cover' | 'contain' = props.backgroundSize || 'cover';
   const backgroundColor: string = props.backgroundColor || '#202322';
 
-  /* define state and ref */
-  const [time, setTime] = useState<number>(0); // use this for decide progress bar fill or progress
-  const [transition, setTransition] = useState<boolean>(true); // for switch progress bar animation on or off
-  const [stop, setStop] = useState<boolean>(false); // stop carousel
+  const [position, setPosition] = useState<number>(0);
+  const [isTransition, setIsTransition] = useState<boolean>(true);
+  const [isReset, setIsReset] = useState<boolean>(true);
+  const timeout = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  /*
-    if this variable to specific number not 0,
-    increase or decrease progress time,
-    and skip carousel(integer or negative number)
-  */
-  const skipTime = useRef<number>(0);
+  /* common functions */
+  function sleep(ms: number): Promise<void> {
+    return new Promise(r => setTimeout(r, ms));
+  }
+  function noneTransition(callback: Function): Promise<void> {
+    return new Promise(async (resolve): Promise<void> => {
+      setIsTransition(false);
+      await sleep(20);
+      callback();
+      await sleep(20);
+      setIsTransition(true);
+      await sleep(20);
+      resolve();
+    });
+  }
+  async function startCarousel(p: number): Promise<void> {
+    if (timeout.current.length > 0) {
+      timeout.current.forEach(n => clearTimeout(n));
+      timeout.current = [];
+    }
 
-  /* common function */
-  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+    setIsReset(false);
+    setPosition(p);
 
-  /* init */
+    timeout.current.push(setTimeout(async () => {
+      if (p === images.length - 1) {
+        await sleep(2000);
+        await noneTransition(() => setIsReset(true));
+        startCarousel(0);
+      } else {
+        startCarousel(p + 1);
+      }
+    }, nextMsec));
+  }
+  async function skip(w: 'next' | 'before') {
+    const afterPosition = w === 'next'
+      ? position === images.length - 1 ? 0 : position + 1
+      : position === 0 ? 0 : position - 1
+
+    await noneTransition(async () => {
+      setIsReset(true);
+      await sleep(20);
+      startCarousel(afterPosition);
+    });
+  }
+
+  /* initialize */
   useEffect(() => {
-    setTransition(false);
-    setTime(0);
-    setTransition(true);
+    (async () => {
+      await noneTransition(() => setIsReset(true));
+      startCarousel(0);
+    })();
   }, [props.images]);
 
-  /* manage interval */
-  const [intervalState, setIntervalState] = useState<boolean>(true);
-  useInterval(() => setIntervalState(!intervalState), speed);
-
-  /* main processing */
-  useEffect(() => {
-    if (stop === true) return;
-
-    (async () => {
-      if (time >= max) {
-        /*
-          if carousel finished,
-          wait 2 seconds, and reset.
-        */
-        setStop(true);
-        await sleep(2000);
-        setTransition(false);
-        setTime(0);
-        setStop(false);
-        return;
-      }
-
-      /*
-        if want skip, must off animation.
-        because each progress bar animation is independently.
-      */
-      setTransition(skipTime.current !== 0 ? false : true);
-
-      const n = time + speed + skipTime.current;
-      const isMinus = n < 0;
-      const isOverMax = n > max;
-      setTime(isMinus ? speed : isOverMax ? max : n);
-      skipTime.current = 0;
-    })()
-  }, [intervalState]);
-
-  /* use for display image and progress */
-  const nowTime = Math.floor(time / nextMsec);
-  const image = nowTime === images.length ? images[images.length - 1] : images[nowTime];
-
-  /* for skip when click or flip */
-  function skip(range: 'increace' | 'decreace'): void {
-    if (stop === true) return;
-    skipTime.current = range === 'increace' ? nextMsec : -nextMsec;
-  }
 
   /* when flip */
   const coordX = useRef<number>(0);
-
   function ontouchstart(e: any): void {
     const touches = e.changedTouches[0];
     coordX.current = touches.pageX;
   }
-
   function ontouchend(e: any): void {
     const touches = e.changedTouches[0];
     const diff = touches.pageX - coordX.current;
     if (Math.abs(diff) > 100) {
-      skip(Math.sign(diff) > -1 ? 'decreace' : 'increace');
+      skip(Math.sign(diff) > -1 ? 'before' : 'next');
     }
   }
 
-
   return (
-    <div id="react-instagram-carousel"
+    <div
+      className="reactInstagramCarousel"
       onTouchStart={ontouchstart}
       onTouchEnd={ontouchend}>
 
       {
-        images.map(v => (
+        images.map((v, k) => (
           <div
-            className="images-in-carousel"
+            className="reactInstagramCarousel__image"
             style={{
               backgroundImage: `url(${v})`,
               backgroundSize,
               backgroundColor,
-              opacity: v === image ? 1 : 0
+              opacity: isReset
+                ? k === 0 ? 1 : 0
+                : k === position ? 1 : 0
             }}
             key={v} />
         ))
       }
 
       <div
-        className="hidden-box-for-click-skip"
-        onClick={() => skip('decreace')} />
+        className="reactInstagramCarousel__skip--left"
+        onClick={() => skip('before')} />
       <div
-        className="hidden-box-for-click-skip"
-        onClick={() => skip('increace')} />
+        className="reactInstagramCarousel__skip--right"
+        onClick={() => skip('next')} />
 
-      <div className="bar-box">
+      <div className="reactInstagramCarousel__progressBarSpace">
         {
           images.map((_, k) => (
-            <div className="bar" style={{
-              width: `calc(100% / ${images.length} - 6%)`,
-              height: `${barHeight}px`
-            }} key={k}>
-              <div className='load' style={{
-                width:
-                  k + 1 <= nowTime // already
-                    ? '100%'
-                    : k === nowTime // nowTime
-                      ? `${(Math.floor((time + speed) - (k * nextMsec)) / nextMsec) * 100}%`
-                      : '0%', // still
-                transition: transition  ? `${speed}ms linear` : '0s'
-              }} key={k} />
+            <div
+              className="reactInstagramCarousel__progressBar"
+              style={{
+                width: `calc(100% / ${images.length} - 6%)`,
+                height: `${barHeight}px`
+              }}
+              key={k}>
+              <div
+                className='reactInstagramCarousel__progressBar--load'
+                style={{
+                  width: isReset
+                    ? "0"
+                    : k <= position ? "100%" : "0",
+                  transition: isTransition
+                    ? k === position ? `${nextMsec}ms linear` : "0s"
+                    : "0s"
+                }} />
             </div>
           ))
         }

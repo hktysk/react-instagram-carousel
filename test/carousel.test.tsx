@@ -8,7 +8,7 @@ Enzyme.configure({
   adapter: new Adapter()
 });
 
-describe('render gallery component', () => {
+describe('render carousel component', () => {
   let images: string[] = []
   for (let i = 0; i < 5; i++) {
     images.push(`/images/${i}.jpg`)
