@@ -15,7 +15,6 @@
 * [babel](https://github.com/babel/babel)
 * [Jest](https://github.com/facebook/jest)
 * [enzyme](https://github.com/airbnb/enzyme)
-* [use-interval](https://github.com/Hermanya/use-interval#readme)
 
 ### Installation
 ```sh
@@ -72,19 +71,17 @@ export default App;
 <Carousel
   images={images}
   nextMsec={3000}
-  speed={20}
   barHeight={3}
   backgroundSize={'contain'}
   backgroundColor={'white'} />
 ```
-| props | description |
-| --- | --- |
-| images | string array. required. URL for display images. must length 2 or more. |
-| nextMsec? | number. time until next image. unit is msec. (default: 5000) |
-| speed? | number. progress bar forward speed. unit is msec. (default: 200) |
-| barHeight? | number. height for progress bar. unit is px. (default: 1.5) |
-| backgroundSize? | 'cover' or 'contain'. background-size property for CSS. (default: 'cover') |
-| backgroundColor? | string. background-color property for CSS. (default: '#202322') |
+| Props | Type | Default | Required | Description |
+| --- | --- | --- | --- | --- |
+| images | string[] |  | Yes | URL for images. must length 2 or more. |
+| nextMsec | number | 5000 | No | time until next image. unit is msec. |
+| barHeight | number | 1.5 | No | height for progress bar. unit is px. |
+| backgroundSize | 'cover' or 'contain' | 'cover' | No | background-size property for CSS. |
+| backgroundColor | string | #202322 | No | background-color property for CSS. |
 
 ### Example
 ```sh
