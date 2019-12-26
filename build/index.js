@@ -379,12 +379,12 @@ var App = function (props) {
   }
 
   return _react.default.createElement("div", {
-    id: "react-instagram-carousel",
+    className: "reactInstagramCarousel",
     onTouchStart: ontouchstart,
     onTouchEnd: ontouchend
   }, images.map(function (v, k) {
     return _react.default.createElement("div", {
-      className: "images-in-carousel",
+      className: "reactInstagramCarousel__image",
       style: {
         backgroundImage: "url(" + v + ")",
         backgroundSize: backgroundSize,
@@ -394,32 +394,31 @@ var App = function (props) {
       key: v
     });
   }), _react.default.createElement("div", {
-    className: "hidden-box-for-click-skip",
+    className: "reactInstagramCarousel__skip--left",
     onClick: function () {
       return skip('before');
     }
   }), _react.default.createElement("div", {
-    className: "hidden-box-for-click-skip",
+    className: "reactInstagramCarousel__skip--right",
     onClick: function () {
       return skip('next');
     }
   }), _react.default.createElement("div", {
-    className: "bar-box"
+    className: "reactInstagramCarousel__progressBarSpace"
   }, images.map(function (_, k) {
     return _react.default.createElement("div", {
-      className: "bar",
+      className: "reactInstagramCarousel__progressBar",
       style: {
         width: "calc(100% / " + images.length + " - 6%)",
         height: barHeight + "px"
       },
       key: k
     }, _react.default.createElement("div", {
-      className: 'load',
+      className: 'reactInstagramCarousel__progressBar--load',
       style: {
         width: isReset ? "0" : k <= position ? "100%" : "0",
         transition: isTransition ? k === position ? nextMsec + "ms linear" : "0s" : "0s"
-      },
-      key: k
+      }
     }));
   })));
 };

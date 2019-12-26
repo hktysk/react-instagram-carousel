@@ -94,14 +94,15 @@ const App: React.FC<Props> = (props) => {
   }
 
   return (
-    <div id="react-instagram-carousel"
+    <div
+      className="reactInstagramCarousel"
       onTouchStart={ontouchstart}
       onTouchEnd={ontouchend}>
 
       {
         images.map((v, k) => (
           <div
-            className="images-in-carousel"
+            className="reactInstagramCarousel__image"
             style={{
               backgroundImage: `url(${v})`,
               backgroundSize,
@@ -115,27 +116,32 @@ const App: React.FC<Props> = (props) => {
       }
 
       <div
-        className="hidden-box-for-click-skip"
+        className="reactInstagramCarousel__skip--left"
         onClick={() => skip('before')} />
       <div
-        className="hidden-box-for-click-skip"
+        className="reactInstagramCarousel__skip--right"
         onClick={() => skip('next')} />
 
-      <div className="bar-box">
+      <div className="reactInstagramCarousel__progressBarSpace">
         {
           images.map((_, k) => (
-            <div className="bar" style={{
-              width: `calc(100% / ${images.length} - 6%)`,
-              height: `${barHeight}px`
-            }} key={k}>
-            <div className='load' style={{
-              width: isReset
-                ? "0"
-                : k <= position ? "100%" : "0",
-              transition: isTransition
-                ? k === position ? `${nextMsec}ms linear` : "0s"
-                : "0s"
-            }} key={k} />
+            <div
+              className="reactInstagramCarousel__progressBar"
+              style={{
+                width: `calc(100% / ${images.length} - 6%)`,
+                height: `${barHeight}px`
+              }}
+              key={k}>
+              <div
+                className='reactInstagramCarousel__progressBar--load'
+                style={{
+                  width: isReset
+                    ? "0"
+                    : k <= position ? "100%" : "0",
+                  transition: isTransition
+                    ? k === position ? `${nextMsec}ms linear` : "0s"
+                    : "0s"
+                }} />
             </div>
           ))
         }
