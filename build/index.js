@@ -7,11 +7,7 @@ exports.default = void 0;
 
 var _react = _interopRequireWildcard(require("react"));
 
-var _useInterval = _interopRequireDefault(require("use-interval"));
-
 require("./style.css");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
@@ -164,104 +160,198 @@ var App = function (props) {
   /* define base variable */
 
   var nextMsec = props.nextMsec || 5000;
-  var max = nextMsec * images.length - 1;
-  var speed = props.speed || 200;
   var barHeight = props.barHeight || 1.5;
   var backgroundSize = props.backgroundSize || 'cover';
   var backgroundColor = props.backgroundColor || '#202322';
-  /* define state and ref */
 
   var _a = (0, _react.useState)(0),
-      time = _a[0],
-      setTime = _a[1]; // use this for decide progress bar fill or progress
-
+      position = _a[0],
+      setPosition = _a[1];
 
   var _b = (0, _react.useState)(true),
-      transition = _b[0],
-      setTransition = _b[1]; // for switch progress bar animation on or off
+      isTransition = _b[0],
+      setIsTransition = _b[1];
 
+  var _c = (0, _react.useState)(true),
+      isReset = _c[0],
+      setIsReset = _c[1];
 
-  var _c = (0, _react.useState)(false),
-      stop = _c[0],
-      setStop = _c[1]; // stop carousel
+  var timeout = (0, _react.useRef)([]);
+  /* common functions */
 
-  /*
-    if this variable to specific number not 0,
-    increase or decrease progress time,
-    and skip carousel(integer or negative number)
-  */
-
-
-  var skipTime = (0, _react.useRef)(0);
-  /* common function */
-
-  var sleep = function (ms) {
+  function sleep(ms) {
     return new Promise(function (r) {
       return setTimeout(r, ms);
     });
-  };
-  /* init */
+  }
 
+  function noneTransition(callback) {
+    var _this = this;
 
-  (0, _react.useEffect)(function () {
-    setTransition(false);
-    setTime(0);
-    setTransition(true);
-  }, [props.images]);
-  /* manage interval */
-
-  var _d = (0, _react.useState)(true),
-      intervalState = _d[0],
-      setIntervalState = _d[1];
-
-  (0, _useInterval.default)(function () {
-    return setIntervalState(!intervalState);
-  }, speed);
-  /* main processing */
-
-  (0, _react.useEffect)(function () {
-    if (stop === true) return;
-
-    (function () {
-      return __awaiter(void 0, void 0, void 0, function () {
-        var n, isMinus, isOverMax;
+    return new Promise(function (resolve) {
+      return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_a) {
           switch (_a.label) {
             case 0:
-              if (!(time >= max)) return [3
-              /*break*/
-              , 2];
-              /*
-                if carousel finished,
-                wait 2 seconds, and reset.
-              */
-
-              setStop(true);
+              setIsTransition(false);
               return [4
               /*yield*/
-              , sleep(2000)];
+              , sleep(20)];
 
             case 1:
               _a.sent();
 
-              setTransition(false);
-              setTime(0);
-              setStop(false);
+              callback();
+              return [4
+              /*yield*/
+              , sleep(20)];
+
+            case 2:
+              _a.sent();
+
+              setIsTransition(true);
+              return [4
+              /*yield*/
+              , sleep(20)];
+
+            case 3:
+              _a.sent();
+
+              resolve();
               return [2
               /*return*/
               ];
+          }
+        });
+      });
+    });
+  }
 
-            case 2:
-              /*
-                if want skip, must off animation.
-                because each progress bar animation is independently.
-              */
-              setTransition(skipTime.current !== 0 ? false : true);
-              n = time + speed + skipTime.current;
-              isMinus = n < 0;
-              isOverMax = n > max;
-              setTime(isMinus ? speed : isOverMax ? max : n);
-              skipTime.current = 0;
+  function startCarousel(p) {
+    return __awaiter(this, void 0, void 0, function () {
+      var _this = this;
+
+      return __generator(this, function (_a) {
+        if (timeout.current.length > 0) {
+          timeout.current.forEach(function (n) {
+            return clearTimeout(n);
+          });
+          timeout.current = [];
+        }
+
+        setIsReset(false);
+        setPosition(p);
+        timeout.current.push(setTimeout(function () {
+          return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+              switch (_a.label) {
+                case 0:
+                  if (!(p === images.length - 1)) return [3
+                  /*break*/
+                  , 3];
+                  return [4
+                  /*yield*/
+                  , sleep(2000)];
+
+                case 1:
+                  _a.sent();
+
+                  return [4
+                  /*yield*/
+                  , noneTransition(function () {
+                    return setIsReset(true);
+                  })];
+
+                case 2:
+                  _a.sent();
+
+                  startCarousel(0);
+                  return [3
+                  /*break*/
+                  , 4];
+
+                case 3:
+                  startCarousel(p + 1);
+                  _a.label = 4;
+
+                case 4:
+                  return [2
+                  /*return*/
+                  ];
+              }
+            });
+          });
+        }, nextMsec));
+        return [2
+        /*return*/
+        ];
+      });
+    });
+  }
+
+  function skip(w) {
+    return __awaiter(this, void 0, void 0, function () {
+      var afterPosition;
+
+      var _this = this;
+
+      return __generator(this, function (_a) {
+        switch (_a.label) {
+          case 0:
+            afterPosition = w === 'next' ? position === images.length - 1 ? 0 : position + 1 : position === 0 ? 0 : position - 1;
+            return [4
+            /*yield*/
+            , noneTransition(function () {
+              return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                  switch (_a.label) {
+                    case 0:
+                      setIsReset(true);
+                      return [4
+                      /*yield*/
+                      , sleep(20)];
+
+                    case 1:
+                      _a.sent();
+
+                      startCarousel(afterPosition);
+                      return [2
+                      /*return*/
+                      ];
+                  }
+                });
+              });
+            })];
+
+          case 1:
+            _a.sent();
+
+            return [2
+            /*return*/
+            ];
+        }
+      });
+    });
+  }
+  /* initialize */
+
+
+  (0, _react.useEffect)(function () {
+    (function () {
+      return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+          switch (_a.label) {
+            case 0:
+              return [4
+              /*yield*/
+              , noneTransition(function () {
+                return setIsReset(true);
+              })];
+
+            case 1:
+              _a.sent();
+
+              startCarousel(0);
               return [2
               /*return*/
               ];
@@ -269,19 +359,8 @@ var App = function (props) {
         });
       });
     })();
-  }, [intervalState]);
-  /* use for display image and progress */
-
-  var nowTime = Math.floor(time / nextMsec);
-  var image = nowTime === images.length ? images[images.length - 1] : images[nowTime];
-  /* for skip when click or flip */
-
-  function skip(range) {
-    if (stop === true) return;
-    skipTime.current = range === 'increace' ? nextMsec : -nextMsec;
-  }
+  }, [props.images]);
   /* when flip */
-
 
   var coordX = (0, _react.useRef)(0);
 
@@ -295,7 +374,7 @@ var App = function (props) {
     var diff = touches.pageX - coordX.current;
 
     if (Math.abs(diff) > 100) {
-      skip(Math.sign(diff) > -1 ? 'decreace' : 'increace');
+      skip(Math.sign(diff) > -1 ? 'before' : 'next');
     }
   }
 
@@ -303,26 +382,26 @@ var App = function (props) {
     id: "react-instagram-carousel",
     onTouchStart: ontouchstart,
     onTouchEnd: ontouchend
-  }, images.map(function (v) {
+  }, images.map(function (v, k) {
     return _react.default.createElement("div", {
       className: "images-in-carousel",
       style: {
         backgroundImage: "url(" + v + ")",
         backgroundSize: backgroundSize,
         backgroundColor: backgroundColor,
-        opacity: v === image ? 1 : 0
+        opacity: isReset ? k === 0 ? 1 : 0 : k === position ? 1 : 0
       },
       key: v
     });
   }), _react.default.createElement("div", {
     className: "hidden-box-for-click-skip",
     onClick: function () {
-      return skip('decreace');
+      return skip('before');
     }
   }), _react.default.createElement("div", {
     className: "hidden-box-for-click-skip",
     onClick: function () {
-      return skip('increace');
+      return skip('next');
     }
   }), _react.default.createElement("div", {
     className: "bar-box"
@@ -337,10 +416,8 @@ var App = function (props) {
     }, _react.default.createElement("div", {
       className: 'load',
       style: {
-        width: k + 1 <= nowTime // already
-        ? '100%' : k === nowTime // nowTime
-        ? Math.floor(time + speed - k * nextMsec) / nextMsec * 100 + "%" : '0%',
-        transition: transition ? speed + "ms linear" : '0s'
+        width: isReset ? "0" : k <= position ? "100%" : "0",
+        transition: isTransition ? k === position ? nextMsec + "ms linear" : "0s" : "0s"
       },
       key: k
     }));
