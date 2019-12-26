@@ -248,33 +248,26 @@ var App = function (props) {
                 case 0:
                   if (!(p === images.length - 1)) return [3
                   /*break*/
-                  , 3];
-                  return [4
-                  /*yield*/
-                  , sleep(2000)];
-
-                case 1:
-                  _a.sent();
-
+                  , 2];
                   return [4
                   /*yield*/
                   , noneTransition(function () {
                     return setIsReset(true);
                   })];
 
-                case 2:
+                case 1:
                   _a.sent();
 
                   startCarousel(0);
                   return [3
                   /*break*/
-                  , 4];
+                  , 3];
+
+                case 2:
+                  startCarousel(p + 1);
+                  _a.label = 3;
 
                 case 3:
-                  startCarousel(p + 1);
-                  _a.label = 4;
-
-                case 4:
                   return [2
                   /*return*/
                   ];
@@ -389,7 +382,7 @@ var App = function (props) {
         backgroundImage: "url(" + v + ")",
         backgroundSize: backgroundSize,
         backgroundColor: backgroundColor,
-        opacity: isReset ? k === 0 ? 1 : 0 : k === position ? 1 : 0
+        opacity: k === position ? 1 : 0
       },
       key: v
     });

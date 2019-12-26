@@ -50,7 +50,6 @@ const App: React.FC<Props> = (props) => {
 
     timeout.current.push(setTimeout(async () => {
       if (p === images.length - 1) {
-        await sleep(2000);
         await noneTransition(() => setIsReset(true));
         startCarousel(0);
       } else {
@@ -107,9 +106,7 @@ const App: React.FC<Props> = (props) => {
               backgroundImage: `url(${v})`,
               backgroundSize,
               backgroundColor,
-              opacity: isReset
-                ? k === 0 ? 1 : 0
-                : k === position ? 1 : 0
+              opacity: k === position ? 1 : 0
             }}
             key={v} />
         ))
